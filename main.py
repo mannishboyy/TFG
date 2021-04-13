@@ -1,6 +1,7 @@
 import csv
 import glob
-#THIS FUNCTION RETURNS THE ON SET VALUES TO COMPARE.
+import pandas as pd
+#THIS FUNCTION RETURNS THE ON SET VALUES OF THE ORIGINAL PIECE TO COMPARE.
 def o_file(o_filename):
     with open(o_filename, 'r') as original:
         value_original = []
@@ -10,7 +11,7 @@ def o_file(o_filename):
             #print(row)
     return value_original
 
-#THIS FUNCTION RETURNS THE ON SET VALUES TO COMPARE.
+#THIS FUNCTION RETURNS THE ON SET VALUES TO COMPARE, BETWEEN DIFFERENT PIECES.
 def x_file(x_filename):
     with open(x_filename, 'r') as original:
         value_original = []
@@ -45,8 +46,7 @@ def comp_file0(comp_filename, w_filename, value_original):
             b = value_original[fila]
             resultado = a-float(b)
             result_writer.writerow([resultado])
-
-#THIS FUNCTION MAKES ALL THE COMPARATIONS AND CREATES THE NEW CSV FILES
+#THIS FUNCTION MAKES COMPARATIONS BETWEEN THE ORIGINAL AND THE REST OF THE PIECES, AND CREATES THE NEW CSV FILES
 def Norm0(o_filename,all_files_nmat,files_a,files_b,files_c):
     value_original = o_file(o_filename)
     for file in all_files_nmat:
@@ -63,6 +63,7 @@ def Norm0(o_filename,all_files_nmat,files_a,files_b,files_c):
         comp_file0(files_c[pos], 'Resultados_0/'+file[9:12]+'_B-C.csv',value_original)
         pos =pos+1
 
+#aqui tenia la intención de haceer una normalizació pero creo que no tiene mucha logica
 def NormBE(o_filename,all_files_nmat,files_a,files_b,files_c):
     value_original = o_file(o_filename)
     for file in all_files_nmat:
@@ -78,10 +79,11 @@ def NormBE(o_filename,all_files_nmat,files_a,files_b,files_c):
         value_original = o_file(file)
         comp_fileBE(files_c[pos], 'Resultados_BE/'+file[9:12]+'_B-C.csv',value_original)
         pos =pos+1
-
 def comp_fileBE(comp_filename, w_filename, value_original):
     with open(comp_filename, 'r') as compare, open(w_filename, 'w', newline='') as result:
         compare_reader = csv.reader(compare)
+        data = pd.read_csv(comp_filename, header=0)
+        maxComp = data.at[144, 'Onset_s']
         result_writer = csv.writer(result)
         result_writer.writerow(['OnSet desviation'])
         fila = 1
@@ -96,19 +98,25 @@ def comp_fileBE(comp_filename, w_filename, value_original):
         for row in compare_reader:
             fila = fila+1
             a = float(row[5])-float(norm)
-            a_normBE = (a-min)/(max-min)
-            b = value_original[fila]
-            resultado = a_normBE-float(b)
+            a_normBE = (a-min)/(maxComp-min)
+            b = float(value_original[fila])
+            b_normBE = (b-min)/(max-min)
+            resultado = a_normBE - b_normBE
             result_writer.writerow([resultado])
 
-
+#ORIGINAL PIECE
 o_filename = 'CsvFiles/Miniature1.csv'
+#LIST OF FILES
 all_files_nmat = glob.glob('CsvFiles/*T_nmat.csv')
+# A FILES
 files_a = glob.glob('CsvFiles/*AT_nmat.csv')
+# B FILES
 files_b = glob.glob('CsvFiles/*BT_nmat.csv')
+# C FILES
 files_c = glob.glob('CsvFiles/*CT_nmat.csv')
-Norm0(o_filename,all_files_nmat,files_a,files_b,files_c)
-#NormBE(o_filename,all_files_nmat,files_a,files_b,files_c)
+
+#Norm0(o_filename,all_files_nmat,files_a,files_b,files_c)
+NormBE(o_filename,all_files_nmat,files_a,files_b,files_c)
 
 
 
