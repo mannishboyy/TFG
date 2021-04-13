@@ -1,11 +1,13 @@
 import csv
 import glob
 import pandas as pd
+import librosa
+
 #THIS FUNCTION RETURNS THE ON SET VALUES OF THE ORIGINAL PIECE TO COMPARE.
 def o_file(o_filename):
     with open(o_filename, 'r') as original:
         value_original = []
-        original_reader = csv.reader(original)
+        original_reader = csv.reader(original, dialect='excel')
         for row in original_reader:
             value_original.append(row[5])
             #print(row)
@@ -15,7 +17,7 @@ def o_file(o_filename):
 def x_file(x_filename):
     with open(x_filename, 'r') as original:
         value_original = []
-        original_reader = csv.reader(original)
+        original_reader = csv.reader(original, dialect='excel')
         for linia in original_reader:
             value_original.append(linia[5])
             break
@@ -30,7 +32,7 @@ def x_file(x_filename):
 #THIS FUNCTION COMPARES THE GIVEN VALUES BETWEEN ALL OF THE FILES
 def comp_file0(comp_filename, w_filename, value_original):
     with open(comp_filename, 'r') as compare, open(w_filename, 'w', newline='') as result:
-        compare_reader = csv.reader(compare)
+        compare_reader = csv.reader(compare, dialect='excel')
         result_writer = csv.writer(result)
         result_writer.writerow(['OnSet desviation'])
         fila = 1
@@ -81,7 +83,7 @@ def NormBE(o_filename,all_files_nmat,files_a,files_b,files_c):
         pos =pos+1
 def comp_fileBE(comp_filename, w_filename, value_original):
     with open(comp_filename, 'r') as compare, open(w_filename, 'w', newline='') as result:
-        compare_reader = csv.reader(compare)
+        compare_reader = csv.reader(compare, dialect='excel')
         data = pd.read_csv(comp_filename, header=0)
         maxComp = data.at[144, 'Onset_s']
         result_writer = csv.writer(result)
@@ -115,8 +117,8 @@ files_b = glob.glob('CsvFiles/*BT_nmat.csv')
 # C FILES
 files_c = glob.glob('CsvFiles/*CT_nmat.csv')
 
-#Norm0(o_filename,all_files_nmat,files_a,files_b,files_c)
-NormBE(o_filename,all_files_nmat,files_a,files_b,files_c)
+Norm0(o_filename,all_files_nmat,files_a,files_b,files_c)
+#NormBE(o_filename,all_files_nmat,files_a,files_b,files_c)
 
 
 
